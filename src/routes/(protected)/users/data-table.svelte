@@ -122,7 +122,7 @@
 </script>
 
 <div>
-	<div class="text-muted-foreground flex-1 text-right text-sm">
+	<div class="flex-1 text-right text-sm text-muted-foreground">
 		Page {$pageIndex + 1} of{' '}
 		{Math.floor($rows.length / $pageSize) + 1}
 	</div>
@@ -206,7 +206,7 @@
 		</Table.Root>
 	</div>
 	<div class="flex items-center justify-end space-x-4 py-4">
-		<div class="text-muted-foreground flex-1 text-sm">
+		<div class="flex-1 text-sm text-muted-foreground">
 			{Object.keys($selectedDataIds).length} of{' '}
 			{$rows.length} row(s) selected.
 		</div>
