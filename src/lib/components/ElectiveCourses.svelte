@@ -28,8 +28,9 @@
 		(course) => !cours.some((c) => c.id === course.id)
 	);
 
-	$: credits =
-			data.programElectives[0]?.credits ? data.programElectives[0].credits - cours.reduce((acc, course) => acc + course.credits, 0) : 0;
+	$: credits = data.programElectives[0]?.credits
+		? data.programElectives[0].credits - cours.reduce((acc, course) => acc + course.credits, 0)
+		: 0;
 
 	const addElectiveCourses = (event: MouseEvent) => {
 		event.preventDefault();

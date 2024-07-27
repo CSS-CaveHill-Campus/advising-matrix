@@ -175,14 +175,26 @@ export const load: PageServerLoad = async ({ locals }) => {
 
 	const electiveCourses = await db
 		.selectFrom('Course')
-		.where("Course.code", 'like', '____1%')
+		.where('Course.code', 'like', '____1%')
 		.where('Course.id', 'not in', programCore.details.courses)
 		.selectAll()
 		.execute();
 
-		const studentCourses = await db.selectFrom('Student').innerJoin("StudentCourse", "StudentCourse.studentId", "Student.id").where('Student.user_id', '=', userId).selectAll().execute();
+	const studentCourses = await db
+		.selectFrom('Student')
+		.innerJoin('StudentCourse', 'StudentCourse.studentId', 'Student.id')
+		.where('Student.user_id', '=', userId)
+		.selectAll()
+		.execute();
 
-	return { program, programRequirements, programCourses, electiveCourses, programElectives, studentCourses };
+	return {
+		program,
+		programRequirements,
+		programCourses,
+		electiveCourses,
+		programElectives,
+		studentCourses
+	};
 
 	// const studentId = await getStudentId(userId);
 	// if (!studentId) throw error(404, 'Student not found');

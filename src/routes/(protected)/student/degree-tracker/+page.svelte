@@ -41,8 +41,6 @@
 		completedCoursesStore.set(completed);
 	}
 
-	
-
 	// $: creditsAmt = studentElectiveCourses.reduce((acc, course) => acc + course.credits, 0);
 
 	// $: console.log('Program Courses:', programCourses);
@@ -56,10 +54,12 @@
 	<div class="flex flex-wrap justify-between gap-y-2">
 		<div class="flex flex-wrap items-center gap-2">
 			<Button
-				class="rounded-md px-4 py-3 text-sm font-medium text-white shadow-sm transition-colors duration-200 focus:outline-none focus:ring-2 focus:ring-indigo-500 focus:ring-offset-2 bg-indigo-600 hover:bg-indigo-700 "
+				class="rounded-md bg-indigo-600 px-4 py-3 text-sm font-medium text-white shadow-sm transition-colors duration-200 hover:bg-indigo-700 focus:outline-none focus:ring-2 focus:ring-indigo-500 focus:ring-offset-2 "
 				>All Courses</Button
 			>
-			<Button class="flex items-center rounded-md bg-gray-200 px-3 py-1.5 text-sm text-gray-700  font-medium  shadow-sm transition-colors duration-200 focus:outline-none focus:ring-2 focus:ring-indigo-500 focus:ring-offset-2 hover:bg-white ">
+			<Button
+				class="flex items-center rounded-md bg-gray-200 px-3 py-1.5 text-sm font-medium  text-gray-700  shadow-sm transition-colors duration-200 hover:bg-white focus:outline-none focus:ring-2 focus:ring-indigo-500 focus:ring-offset-2 "
+			>
 				<svg
 					class="mr-1 h-4 w-4"
 					fill="none"
@@ -76,7 +76,9 @@
 				</svg>
 				Still Needed (stillNeeded)
 			</Button>
-			<Button class="flex items-center rounded-md bg-gray-200 px-3 py-1.5 text-sm text-gray-700  font-medium  shadow-sm transition-colors duration-200 focus:outline-none focus:ring-2 focus:ring-indigo-500 focus:ring-offset-2 hover:bg-white ">
+			<Button
+				class="flex items-center rounded-md bg-gray-200 px-3 py-1.5 text-sm font-medium  text-gray-700  shadow-sm transition-colors duration-200 hover:bg-white focus:outline-none focus:ring-2 focus:ring-indigo-500 focus:ring-offset-2 "
+			>
 				<svg
 					class="mr-1 h-4 w-4"
 					fill="none"
@@ -93,7 +95,9 @@
 				</svg>
 				In Progress (inProgress)
 			</Button>
-			<Button class="fflex items-center rounded-md bg-gray-200 px-3 py-1.5 text-sm text-gray-700  font-medium  shadow-sm transition-colors duration-200 focus:outline-none focus:ring-2 focus:ring-indigo-500 focus:ring-offset-2 hover:bg-white ">
+			<Button
+				class="fflex items-center rounded-md bg-gray-200 px-3 py-1.5 text-sm font-medium  text-gray-700  shadow-sm transition-colors duration-200 hover:bg-white focus:outline-none focus:ring-2 focus:ring-indigo-500 focus:ring-offset-2 "
+			>
 				<svg
 					class="mr-1 h-4 w-4"
 					fill="none"
@@ -107,11 +111,11 @@
 				Complete (complete)
 			</Button>
 		</div>
-	
+
 		<div class="flex flex-col items-end">
 			<div class="mb-1 text-sm text-gray-600">15 / 24 Credits Applied</div>
 			<div class="w-48">
-				<Progress value={15} max={24}/>
+				<Progress value={15} max={24} />
 			</div>
 		</div>
 	</div>
@@ -171,11 +175,5 @@
 		</ul>
 	</div>
 
-	
 	<ElectiveCourses {data} />
 </div>
-
-
-
-
-

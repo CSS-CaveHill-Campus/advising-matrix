@@ -8,7 +8,7 @@
 
 <Sidebar {user} />
 <main class="h-screen bg-gray-50 ps-16 md:ps-64">
-	<div class=" p-6 border">
+	<div class=" border p-6">
 		<slot />
 	</div>
 </main>
