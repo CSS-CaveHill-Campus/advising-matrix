@@ -3,7 +3,6 @@
 	import uwiBanner from '$lib/assets/img/uwi_banner.png';
 	import Button from '$lib/components/ui/Button.svelte';
 	import { superForm } from 'sveltekit-superforms';
-	// export let form;
 	export let data;
 
 	const { form, errors, constraints, enhance, submitting, delayed, timeout } = superForm(

@@ -23,7 +23,7 @@
 
 {#if data.token}
 	<div
-		class="flex min-h-screen items-center justify-center bg-gradient-to-b from-[#fdfdfc] to-[#f9f9f8] font-sans"
+		class="flex min-h-screen items-center justify-center bg-gradient-to-b from-[#fdfdfc] to-[#f9f9f8] font-sans py-8 px-6"
 	>
 		<div class="w-full max-w-md rounded-3xl bg-white p-8 shadow-lg">
 			<div class="mb-8 flex justify-center">

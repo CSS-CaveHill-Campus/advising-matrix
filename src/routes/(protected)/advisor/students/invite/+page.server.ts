@@ -86,7 +86,8 @@ export const actions: Actions = {
 						invite_token: token,
 						invite_expires: new Date(expiresAt),
 						created_at: new Date(),
-						updated_at: new Date()
+						updated_at: new Date(),
+						Electives: ''
 					})
 					.execute();
 			});
