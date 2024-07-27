@@ -107,7 +107,29 @@ async function getElectiveCourses(
 					.where('Department.name', 'in', details.facultyPool);
 			}
 
-			const courses = await query.execute();
+			let courses = await query.execute();
+
+			const prerequisites = await db
+				.selectFrom('CoursePrerequisite as CP')
+				.innerJoin('Course as C', 'CP.prerequisiteId', 'C.id')
+				.select([
+					'CP.courseId',
+					'CP.prerequisiteId',
+					'C.code as prerequisiteCode',
+					'C.name as prerequisiteName'
+				])
+				.execute();
+
+			courses = courses.map((course) => ({
+				...course,
+				prerequisites: prerequisites
+					.filter((prereq) => prereq.courseId === course.id)
+					.map(({ prerequisiteId, prerequisiteCode, prerequisiteName }) => ({
+						id: prerequisiteId,
+						code: prerequisiteCode,
+						name: prerequisiteName
+					}))
+			}));
 
 			const completedCourses = courses.filter((course) => course.id in studentCourses);
 			const appliedCredits = completedCourses.reduce((sum, course) => sum + course.credits, 0);
@@ -173,11 +195,6 @@ export const load: PageServerLoad = async ({ locals }) => {
 		.select('Student.Electives')
 		.executeTakeFirst();
 
-	// *Debugging
-	console.log('Program:', program);
-	console.log('Program Courses:', programCourses);
-	console.log('Elective Courses:', electiveCourses);
-	console.log('Student Courses:', studentCourses);
 	return {
 		program,
 		programCourses,

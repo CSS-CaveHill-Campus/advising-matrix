@@ -3,11 +3,20 @@
 	import * as Dialog from '$lib/components/ui/dialog';
 	import { Button, buttonVariants } from '$lib/components/ui/button';
 	import { Label } from '$lib/components/ui/label';
-	import type { PageData } from '../../routes/(protected)/student/degree-tracker/$types';
 	import { gradePoints } from '$lib/types';
 	import { onMount } from 'svelte';
 
-	export let data: PageData;
+	export let data;
+
+	export let completedCoursesStore;
+
+	export let courseGradesStore;
+
+	export let arePrerequisitesMet;
+
+	export let handleGradeChange;
+
+	console.log($completedCoursesStore);
 
 	let selectedCourse = {
 		label: '',
@@ -19,6 +28,7 @@
 		name: string;
 		level: number;
 		credits: number;
+		prerequisites: { id: string; code: string; name: string }[];
 	};
 
 	$: ElectiveCourseIds = data.electivesIDs;
@@ -27,31 +37,28 @@
 
 	onMount(() => {
 		ElectiveCourseIds.forEach((id: string) => {
-			const course = data.electiveCourses[0]?.courses.find((course) => course.id === id);
+			const course = data.electiveCourses[0]?.courses.find((course: Course) => course.id === id);
 			if (course) {
 				cours = [...cours, course];
 			}
 		});
 	});
 
-	$: electiveCredits = data.program.requirements
-		.filter((requirement) => requirement.type === 'POOL')
-		.reduce((acc, requirement) => {
-			return acc + requirement.credits;
-		}, 0);
-
 	$: electiveCourses =
-		data.electiveCourses[0]?.courses.filter((course) => !cours.some((c) => c.id === course.id)) ??
-		[];
+		data.electiveCourses[0]?.courses.filter(
+			(course: Course) => !cours.some((c) => c.id === course.id)
+		) ?? [];
 
-	$: credits = electiveCredits
+	$: electiveCredits = data.electiveCourses[0]?.requiredCredits;
+
+	$: remainingCredits = electiveCredits
 		? electiveCredits - cours.reduce((acc, course) => acc + course.credits, 0)
 		: 0;
 
 	const addElectiveCourses = (event: MouseEvent) => {
 		event.preventDefault();
 		const course = data.electiveCourses[0]?.courses.find(
-			(course) => course.id === selectedCourse.value
+			(course: Course) => course.id === selectedCourse.value
 		);
 		if (!course) return;
 		cours = [...cours, course];
@@ -84,6 +91,10 @@
 		}
 	}
 
+	data.electiveCourses[0]?.courses.forEach((course: Course) => {
+		course.credits = 3;
+	});
+
 	let dialogOpen = false;
 
 	let savedElectives = false;
@@ -93,9 +104,10 @@
 <div class="container py-6">
 	<div class="flex flex-wrap items-center">
 		<h2 class="py-5 text-xl font-bold">
-			Level 1 Electives: {#if credits > 0}Require {credits} credits for any faculty{:else}Completed{/if}
+			Level 1 Electives: {#if remainingCredits > 0}Require {remainingCredits} remainingCredits for any
+				faculty{:else}Completed{/if}
 		</h2>
-		{#if credits > 0}
+		{#if remainingCredits > 0}
 			<Dialog.Root bind:open={dialogOpen}>
 				<Dialog.Trigger class={buttonVariants({ variant: 'outline', class: 'ml-auto w-fit' })}
 					>Add Elective Course</Dialog.Trigger
@@ -141,7 +153,8 @@
 										<input
 											type="checkbox"
 											id={`course-${course.id}`}
-											name={`course-${course.id}`}
+											name={`courses[${course.id}].completed`}
+											bind:checked={$completedCoursesStore[course.id]}
 											class="h-4 w-4 rounded border-gray-300 text-indigo-600 focus:ring-indigo-500"
 											disabled
 										/>
@@ -168,21 +181,39 @@
 											variant="outline"
 											size="sm"
 											on:click={() => {
-												(cours = cours.filter((c) => c.id !== course.id)),
-													localStorage.setItem('electiveCourses', JSON.stringify(cours));
+												cours = cours.filter((c) => c.id !== course.id);
 											}}
 											class="ml-2 inline-flex items-center rounded-full bg-red-100 px-2.5 py-0.5 text-xs font-medium text-red-800"
 										>
-											X
+											x
 										</Button>
+
+										<!-- Prerequisites Logic -->
+										{#if course.prerequisites && course.prerequisites.length > 0}
+											{@const unmetPrerequisites = course.prerequisites.filter(
+												(prereq) => !$completedCoursesStore[prereq.id]
+											)}
+											{#if unmetPrerequisites.length > 0}
+												<div class="mt-1 text-sm">
+													<span class="font-bold text-red-500">Prerequisites: </span>
+													<span class="text-gray-700">
+														{#each unmetPrerequisites as prereq}
+															<span class="mr-2">{prereq.code}</span>
+														{/each}
+													</span>
+												</div>
+											{/if}
+										{/if}
 									</div>
 								</div>
 								<!-- Grade Selection Logic -->
 								<div class="mt-4 flex-shrink-0 sm:ml-5 sm:mt-0">
 									<select
-										name={`course-${course.id}-grade`}
-										value=""
+										name={`courses[${course.id}].grade`}
+										value={$courseGradesStore[course.id] ?? ''}
+										on:change={(e) => handleGradeChange(course.id, e)}
 										class="rounded-md border-gray-300 text-sm focus:border-indigo-500 focus:ring-indigo-500"
+										disabled={!arePrerequisitesMet(course)}
 									>
 										<option value="">Select Grade</option>
 										{#each Object.keys(gradePoints) as grade}

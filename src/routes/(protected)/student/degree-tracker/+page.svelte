@@ -49,8 +49,11 @@
 	}
 
 	function updateGrade(courseId: string, grade: Grade) {
+		console.log('Updating grade for', courseId, 'to', grade);
 		courseGradesStore.update((grades) => ({ ...grades, [courseId]: grade }));
 		completedCoursesStore.update((completed) => ({ ...completed, [courseId]: !!grade }));
+
+		console.log('Grades:', $courseGradesStore);
 	}
 
 	function handleGradeChange(courseId: string, event: Event) {
@@ -110,6 +113,8 @@
 		);
 	}
 </script>
+
+<!-- <pre>{JSON.stringify(data,null,2)}</pre> -->
 
 <div class="mt-6 overflow-hidden">
 	<div class="flex flex-wrap items-start gap-x-12 px-4 py-2 text-sm">
@@ -291,4 +296,4 @@
 	</div>
 </form>
 
-<ElectiveCourses {data} />
+<ElectiveCourses {data} {completedCoursesStore} {courseGradesStore} {handleGradeChange} {arePrerequisitesMet} />
