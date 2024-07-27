@@ -167,18 +167,24 @@ export const load: PageServerLoad = async ({ locals }) => {
 
 	const electiveCourses = await getElectiveCourses(program.requirements, studentCourses);
 
+	const electivesIDs = await db
+		.selectFrom('Student')
+		.where('user_id', '=', userId)
+		.select('Student.Electives')
+		.executeTakeFirst();
+
 	// *Debugging
 	console.log('Program:', program);
 	console.log('Program Courses:', programCourses);
 	console.log('Elective Courses:', electiveCourses);
 	console.log('Student Courses:', studentCourses);
-
 	return {
 		program,
 		programCourses,
 		electiveCourses,
 		studentCourses,
-		requirements: program.requirements
+		requirements: program.requirements,
+		electivesIDs: JSON.parse(electivesIDs?.Electives ?? '').data
 	};
 };
 
@@ -222,5 +228,27 @@ export const actions: Actions = {
 			console.error('Error saving changes:', err);
 			return fail(500, { message: 'Failed to save changes' });
 		}
+	},
+
+	saveElectives: async ({ request, locals }) => {
+		const userId = locals.user?.id;
+
+		if (!userId) return fail(401, { message: 'Unauthorized' });
+
+		const data = await request.formData();
+
+		const electives = JSON.parse(data.get('electives')?.toString() ?? '');
+
+		const electivesIDs = JSON.stringify({ data: electives.map((e: any) => e.id) });
+
+		const result = await db
+			.updateTable('Student')
+			.set('Electives', electivesIDs)
+			.where('user_id', '=', userId)
+			.execute();
+
+		if (!result) return fail(500, { message: 'Failed to save electives' });
+
+		return { success: true };
 	}
 };

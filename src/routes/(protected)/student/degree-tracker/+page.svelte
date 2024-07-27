@@ -6,7 +6,7 @@
 	import { derived, writable } from 'svelte/store';
 	import type { PageData } from './$types';
 	import type { Course } from '$lib/db/schema';
-
+	import ElectiveCourses from '$lib/components/ElectiveCourses.svelte';
 	export let data: PageData & {
 		programCourses: (Course & {
 			prerequisites: { id: string; code: string; name: string }[];
@@ -290,3 +290,5 @@
 		<Button type="submit">Save Changes</Button>
 	</div>
 </form>
+
+<ElectiveCourses {data} />
