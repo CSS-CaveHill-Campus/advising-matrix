@@ -296,4 +296,10 @@
 	</div>
 </form>
 
-<ElectiveCourses {data} {completedCoursesStore} {courseGradesStore} {handleGradeChange} {arePrerequisitesMet} />
+<ElectiveCourses
+	{data}
+	{completedCoursesStore}
+	{courseGradesStore}
+	{handleGradeChange}
+	{arePrerequisitesMet}
+/>
