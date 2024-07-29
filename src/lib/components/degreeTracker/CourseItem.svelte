@@ -1,15 +1,16 @@
 <script lang="ts">
 	import { gradePoints } from '$lib/types';
 	import type { CourseWithPrerequisites, Grade } from '$lib/types';
+	import { derived } from 'svelte/store';
 
 	export let course: CourseWithPrerequisites;
 	export let completedCoursesStore: any;
 	export let courseGradesStore: any;
 
-	function arePrerequisitesMet(course: CourseWithPrerequisites): boolean {
+	const arePrerequisitesMetStore = derived(completedCoursesStore, ($completedCoursesStore) => {
 		if (!course.prerequisites || course.prerequisites.length === 0) return true;
 		return course.prerequisites.every((prereq) => $completedCoursesStore[prereq.id]);
-	}
+	});
 
 	function handleGradeChange(courseId: string, event: Event) {
 		const target = event.target as HTMLSelectElement;
@@ -72,7 +73,7 @@
 					value={$courseGradesStore[course.id] ?? ''}
 					on:change={(e) => handleGradeChange(course.id, e)}
 					class="rounded-md border-gray-300 text-sm focus:border-indigo-500 focus:ring-indigo-500"
-					disabled={!arePrerequisitesMet(course)}
+					disabled={!$arePrerequisitesMetStore}
 				>
 					<option value="">Select Grade</option>
 					{#each Object.keys(gradePoints) as grade}

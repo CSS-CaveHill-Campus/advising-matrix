@@ -13,7 +13,7 @@ export const load: PageServerLoad = async ({ locals }) => {
 		const courses = await db
 			.selectFrom('Course')
 			.select(['id', 'code', 'name', 'level', 'credits'])
-			.orderBy('code', 'asc')
+			.orderBy(['level asc', 'code asc'])
 			.execute();
 
 		return {

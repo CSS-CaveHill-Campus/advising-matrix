@@ -4,12 +4,17 @@
 	import Button from '$lib/components/ui/Button.svelte';
 	import TrashIcon from '../icons/TrashIcon.svelte';
 	import { enhance } from '$app/forms';
+	import { poolCourses } from '$lib/stores/degreeTracker';
 
 	export let requirement: ProgramRequirement;
-	export let courses: CourseWithRequirement[];
+	let courses: CourseWithRequirement[];
 	export let completedCoursesStore: any;
 	export let courseGradesStore: any;
 	export let onAddCourse: (requirementId: string) => void;
+
+	poolCourses.subscribe((value) => {
+		courses = value;
+	});
 
 	$: currentCredits = courses.reduce((sum, course) => sum + course.credits, 0);
 
@@ -29,6 +34,8 @@
 		if (!course.prerequisites || course.prerequisites.length === 0) return true;
 		return course.prerequisites.every((prereq) => $completedCoursesStore[prereq.id]);
 	}
+
+	let creating = false;
 </script>
 
 <li>
@@ -86,10 +93,25 @@
 								<option value={grade}>{grade}</option>
 							{/each}
 						</select>
-						<form method="POST" action="?/removeCourse" use:enhance>
+						<form
+							method="POST"
+							action="?/removeCourse"
+							use:enhance={() => {
+								creating = true;
+								return async ({ update }) => {
+									await update();
+									courses = courses.filter((c) => c.id !== course.id);
+									creating = false;
+								};
+							}}
+						>
 							<input type="hidden" name="courseId" value={course.id} />
 							<input type="hidden" name="requirementId" value={requirement.id} />
-							<button type="submit" class="ml-2 text-red-500 hover:text-red-700">
+							<button
+								type="submit"
+								class="ml-2 text-red-500 hover:text-red-700"
+								disabled={creating}
+							>
 								<TrashIcon />
 							</button>
 						</form>
