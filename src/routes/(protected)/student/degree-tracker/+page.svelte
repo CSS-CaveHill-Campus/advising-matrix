@@ -14,23 +14,31 @@
 	import Modal from '$lib/components/ui/Modal.svelte';
 	import Select from '$lib/components/ui/dropdown/Select.svelte';
 	import Option from '$lib/components/ui/dropdown/Option.svelte';
+	import { createMajorMinor } from '$lib/utils';
 	import CourseItem from '$lib/components/degreeTracker/CourseItem.svelte';
 	import PoolRequirementItem from '$lib/components/degreeTracker/PoolRequirementPool.svelte';
 	import { poolCourses } from '$lib/stores/degreeTracker';
 	import { onMount } from 'svelte';
 
-	export let data: PageData;
+	type CourseSchema = {
+		programCourses: (Course & {
+			prerequisites: { id: string; code: string; name: string }[];
+		})[];
+	};
 
-	// Destructure data
-	let { program, programCourses, electiveCourses, studentCourses, requirements } = data;
+	export let data: PageData & CourseSchema;
+
+	$: ({ program, programCourses, electiveCourses, studentCourses, requirements } = data);
 
 	// Local state
 	let dialogOpen = false;
 	let currentRequirement: string | null = null;
 
+	let degreeName = createMajorMinor(data.program.name);
+
 	let degree = {
-		name: ['BSc Computer Science', 'BSc Mathematics'],
-		minor: 'N/A',
+		...degreeName,
+		...degreeName,
 		classification: 'Level III/Third Year'
 	};
 
@@ -190,7 +198,7 @@
 		<div class="flex min-w-[200px] flex-col items-start">
 			<span class="uppercase text-gray-500">Current Degree(S)</span>
 			<div class="font-semibold">
-				{#each degree.name as name}
+				{#each degree.major as name}
 					<div>{name}</div>
 				{/each}
 			</div>
@@ -227,7 +235,7 @@
 <div class="flex flex-wrap items-center justify-between gap-y-2">
 	<div class="flex flex-wrap items-center gap-2">
 		<Button>All Courses</Button>
-		<button class="flex items-center rounded-md bg-gray-200 px-3 py-1.5 text-sm text-gray-700">
+		<Button class="bg-gray-200 px-3 py-1 text-sm text-gray-700 hover:bg-gray-600 hover:text-white">
 			<svg
 				class="mr-1 h-4 w-4"
 				fill="none"
@@ -243,7 +251,7 @@
 				></path>
 			</svg>
 			Still Needed ({$stillNeeded})
-		</button>
+		</Button>
 		<button class="flex items-center rounded-md bg-gray-200 px-3 py-1.5 text-sm text-gray-700">
 			<svg
 				class="mr-1 h-4 w-4"
@@ -352,3 +360,5 @@
 		{/if}
 	</div>
 </form>
+
+<ElectiveCourses {data} />

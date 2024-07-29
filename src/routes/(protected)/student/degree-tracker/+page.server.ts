@@ -20,7 +20,16 @@ async function getStudentId(userId: string): Promise<string | null> {
 		.then((result) => result?.id ?? null);
 }
 
-async function getProgram(programName: string): Promise<Program | null> {
+async function getStudentProgramID(userId: string): Promise<string | null> {
+	return await db
+		.selectFrom('Student')
+		.where('user_id', '=', userId)
+		.select('program_id')
+		.executeTakeFirst()
+		.then((result) => result?.program_id ?? null);
+}
+
+async function getProgram(programID: string): Promise<Program | null> {
 	const program = await db
 		.selectFrom('Program')
 		.leftJoin('ProgramRequirement', 'Program.id', 'ProgramRequirement.programId')
@@ -33,7 +42,7 @@ async function getProgram(programName: string): Promise<Program | null> {
 			'ProgramRequirement.credits',
 			'ProgramRequirement.details'
 		])
-		.where('Program.name', '=', programName)
+		.where('Program.id', '=', programID)
 		.execute();
 
 	if (!program.length) return null;
@@ -155,9 +164,15 @@ export const load: PageServerLoad = async ({ locals }) => {
 	if (!userId) throw error(401, 'Unauthorized');
 
 	const studentId = await getStudentId(userId);
+
 	if (!studentId) throw error(404, 'Student not found');
 
-	const program = await getProgram('Computer Science');
+	const studentProgramID = await getStudentProgramID(userId);
+
+	if (!studentProgramID) throw error(404, 'Student Program not found');
+
+	const program = await getProgram(studentProgramID);
+
 	if (!program) throw error(404, 'Program not found');
 
 	const [programCourses, electiveCourses, studentCourses] = await Promise.all([
@@ -170,18 +185,25 @@ export const load: PageServerLoad = async ({ locals }) => {
 		getStudentCourses(studentId)
 	]);
 
+	const electivesIDs = await db
+		.selectFrom('Student')
+		.where('user_id', '=', userId)
+		.select('Student.Electives')
+		.executeTakeFirst();
+
 	// *Debugging
 	// console.log('Program:', program);
 	// console.log('Program Courses:', programCourses);
 	// console.log('Elective Courses:', electiveCourses);
-	console.log('Student Courses:', studentCourses);
+	// console.log('Student Courses:', studentCourses);
 
 	return {
 		program,
 		programCourses,
 		electiveCourses,
 		studentCourses,
-		requirements: program.requirements
+		requirements: program.requirements,
+		electivesIDs: JSON.parse(electivesIDs?.Electives ?? '').data
 	};
 };
 
@@ -192,6 +214,10 @@ export const actions: Actions = {
 
 		const studentId = await getStudentId(userId);
 		if (!studentId) return fail(404, { message: 'Student not found' });
+
+		const studentProgramID = await getStudentProgramID(userId);
+
+		if (!studentProgramID) throw fail(404, { message: 'Student Program not found' });
 
 		const formData = await request.formData();
 		const courseEntries = Array.from(formData.entries())
