@@ -5,18 +5,16 @@
 	import TrashIcon from '../icons/TrashIcon.svelte';
 	import { enhance } from '$app/forms';
 	import { poolCourses } from '$lib/stores/degreeTracker';
+	import { get, writable } from 'svelte/store';
 
 	export let requirement: ProgramRequirement;
-	let courses: CourseWithRequirement[];
+	let courses: CourseWithRequirement;
+	let creating = writable(false);
 	export let completedCoursesStore: any;
 	export let courseGradesStore: any;
 	export let onAddCourse: (requirementId: string) => void;
 
-	poolCourses.subscribe((value) => {
-		courses = value;
-	});
-
-	$: currentCredits = courses.reduce((sum, course) => sum + course.credits, 0);
+	$: currentCredits = $poolCourses.reduce((sum, course) => sum + course.credits, 0);
 
 	function handleGradeChange(courseId: string, event: Event) {
 		const target = event.target as HTMLSelectElement;
@@ -34,8 +32,6 @@
 		if (!course.prerequisites || course.prerequisites.length === 0) return true;
 		return course.prerequisites.every((prereq) => $completedCoursesStore[prereq.id]);
 	}
-
-	let creating = false;
 </script>
 
 <li>
@@ -48,7 +44,7 @@
 				<Button on:click={() => onAddCourse(requirement.id)}>Add Course</Button>
 			{/if}
 		</div>
-		{#each courses as course (course.id)}
+		{#each $poolCourses as course (course.id)}
 			<div class="mt-2 flex items-center">
 				<div class="min-w-0 flex-1 sm:flex sm:items-center sm:justify-between">
 					<div>
@@ -97,11 +93,11 @@
 							method="POST"
 							action="?/removeCourse"
 							use:enhance={() => {
-								creating = true;
+								creating.set(true);
 								return async ({ update }) => {
 									await update();
-									courses = courses.filter((c) => c.id !== course.id);
-									creating = false;
+									poolCourses.set($poolCourses.filter((c) => c.id !== course.id));
+									creating.set(false);
 								};
 							}}
 						>
@@ -110,7 +106,7 @@
 							<button
 								type="submit"
 								class="ml-2 text-red-500 hover:text-red-700"
-								disabled={creating}
+								disabled={$creating}
 							>
 								<TrashIcon />
 							</button>
