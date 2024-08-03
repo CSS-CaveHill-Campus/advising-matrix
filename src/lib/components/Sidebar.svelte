@@ -26,12 +26,15 @@
 		],
 		ADVISOR: [
 			{ icon: HomeIcon, label: 'Home', href: '/' },
+			{ icon: HomeIcon, label: 'Students', href: '/advisor/students' },
+			{ icon: HomeIcon, label: 'Advisor Courses', href: '/advisor/courses' },
 			{ icon: HomeIcon, label: 'Courses', href: '/courses' }
 			// Add more menu items here
 		],
 		ADMIN: [
 			{ icon: HomeIcon, label: 'Home', href: '/' },
-			{ icon: HomeIcon, label: 'Users', href: '/users' }
+			{ icon: HomeIcon, label: 'Users', href: '/users' },
+			{ icon: HomeIcon, label: 'Admin Courses', href: '/admin/courses' }
 			// Add more menu items here
 		]
 	};
@@ -86,14 +89,29 @@
 		<nav class="flex-grow space-y-1 overflow-y-auto p-4">
 			{#if user.role in specificMenuItems}
 				{#each specificMenuItems[user.role] as item}
-					<a
-						href={item.href}
-						class="flex items-center rounded-lg px-4 py-2 transition-colors duration-200
-										{activeItem === item.href ? 'bg-gray-100 text-blue-600' : 'text-gray-700 hover:bg-gray-100'}"
-					>
-						<svelte:component this={item.icon} class="mr-3 h-6 w-6" />
-						<span>{item.label}</span>
-					</a>
+					{#if item.href === '/'}
+						<a
+							href={item.href}
+							class="flex items-center rounded-lg px-4 py-2 transition-colors duration-200
+										{activeItem === `/${user.role.toLowerCase()}`
+								? 'bg-gray-100 text-blue-600'
+								: 'text-gray-700 hover:bg-gray-100'}"
+						>
+							<svelte:component this={item.icon} class="mr-3 h-6 w-6" />
+							<span>{item.label}</span>
+						</a>
+					{:else}
+						<a
+							href={item.href}
+							class="flex items-center rounded-lg px-4 py-2 transition-colors duration-200
+										{activeItem.startsWith(item.href)
+								? 'bg-gray-100 text-blue-600'
+								: 'text-gray-700 hover:bg-gray-100'}"
+						>
+							<svelte:component this={item.icon} class="mr-3 h-6 w-6" />
+							<span>{item.label}</span>
+						</a>
+					{/if}
 				{/each}
 			{/if}
 
@@ -112,7 +130,7 @@
 		<div class="user-menu relative border-t border-gray-200 p-4">
 			<button class="flex w-full items-center justify-between" on:click={toggleUserMenu}>
 				<div class="flex items-center">
-					<Avatar name={user.name} />
+					<Avatar name={user.name} size="sm" />
 					<div class="ml-3">
 						<p class="text-left text-sm font-medium text-gray-700">{user.name}</p>
 						<p class="text-left text-xs text-gray-500">{user.role}</p>

@@ -236,6 +236,28 @@ async function seed() {
 			details: JSON.stringify(requirementDetails)
 		});
 
+		// Insert electives using the POOL type
+
+		try {
+			const requirementId = randomUUID();
+			const requirementDetails = {
+				levelPool: ['I'],
+				facultyPool: 'any'
+			};
+
+			await insertOrIgnore('ProgramRequirement', {
+				id: requirementId,
+				programId: programId,
+				type: 'POOL',
+				credits: 3,
+				details: JSON.stringify(requirementDetails)
+			});
+
+			console.log('Electives seeded successfully for:', programId);
+		} catch (error) {
+			console.error('Error inserting program:', error);
+		}
+
 		console.log('Computer Science program seeded successfully');
 	} catch (error) {
 		console.error('Error inserting program:', error);

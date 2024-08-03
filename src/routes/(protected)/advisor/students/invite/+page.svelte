@@ -35,6 +35,7 @@
 			label="Student Email"
 			placeholder="Enter student's email"
 			required
+			pattern="[a-zA-Z0-9._%+-]+@mycavehill\\.uwi\\.edu"
 			error={$errors.email?.[0]}
 			bind:value={$form.email}
 			{...$constraints.email}

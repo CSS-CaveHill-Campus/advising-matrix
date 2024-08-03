@@ -1,7 +1,22 @@
+<!-- courses.svelte -->
 <script lang="ts">
 	import type { PageData } from './$types';
 	import Card from '$lib/components/Card.svelte';
+	import Pagination from '$lib/components/Pagination.svelte';
 	export let data: PageData;
+
+	let currentPage = 1;
+	const itemsPerPage = 10;
+
+	$: totalPages = Math.ceil(data.courses.length / itemsPerPage);
+	$: paginatedCourses = data.courses.slice(
+		(currentPage - 1) * itemsPerPage,
+		currentPage * itemsPerPage
+	);
+
+	function handlePageChange(newPage: number) {
+		currentPage = newPage;
+	}
 </script>
 
 <Card>
@@ -27,30 +42,28 @@
 									class="px-6 py-3 text-left text-xs font-medium uppercase tracking-wider text-gray-500"
 									>Level</th
 								>
-								<th
-									scope="col"
-									class="px-6 py-3 text-left text-xs font-medium uppercase tracking-wider text-gray-500"
-									>Action</th
-								>
 							</tr>
 						</thead>
 						<tbody class="divide-y divide-gray-200 bg-white">
-							{#if data.courses.length === 0}
+							{#if paginatedCourses.length === 0}
 								<tr>
 									<td
-										colspan="5"
+										colspan="3"
 										class="whitespace-nowrap px-6 py-4 text-center text-sm text-gray-500"
 									>
 										No courses found.
 									</td>
 								</tr>
 							{:else}
-								{#each data.courses as major}
-									<tr class="hover:bg-gray-50">
-										<td class="whitespace-nowrap px-6 py-4 text-sm text-gray-800">{major.code}</td>
-										<td class="whitespace-nowrap px-6 py-4 text-sm text-gray-800">{major.name}</td>
-										<td class="whitespace-nowrap px-6 py-4 text-sm text-gray-800">{major.level}</td>
-										<td class="whitespace-nowrap px-6 py-4 text-sm text-gray-800">{'Action'}</td>
+								{#each paginatedCourses as course}
+									<tr
+										class="cursor-pointer hover:bg-gray-50"
+										on:click={() => (window.location.href = `/courses/${course.id}`)}
+									>
+										<td class="whitespace-nowrap px-6 py-4 text-sm text-gray-800">{course.code}</td>
+										<td class="whitespace-nowrap px-6 py-4 text-sm text-gray-800">{course.name}</td>
+										<td class="whitespace-nowrap px-6 py-4 text-sm text-gray-800">{course.level}</td
+										>
 									</tr>
 								{/each}
 							{/if}
@@ -60,4 +73,6 @@
 			</div>
 		</div>
 	</div>
+
+	<Pagination {currentPage} {totalPages} onPageChange={handlePageChange} />
 </Card>

@@ -2,21 +2,19 @@
 	import { page } from '$app/stores';
 	import DonutChart from '$lib/components/DonutChart.svelte';
 	import PieChart from '$lib/components/PieChart.svelte';
+	import type { PageData } from './$types';
 
-	let advisorName = 'Mr.TempName';
-	let gpa = 3.99;
+	export let data: PageData;
 </script>
 
-<div class="container px-6 py-4">
-	<section id="welcome">
-		<h1>{$page.data.user.role} Dashboard</h1>
-	</section>
-	<section id="charts" class="">
-		<PieChart />
-		<div id="completed-courses" class="border sm:grid sm:grid-cols-3">
-			<DonutChart title="mandatory" />
-			<DonutChart title="elective" />
-			<DonutChart title="foundation" />
-		</div>
-	</section>
-</div>
+<section id="welcome">
+	<h1>{$page.data.user.role} Dashboard - {data.user?.name}</h1>
+</section>
+<section id="charts" class="py-3 md:grid md:grid-cols-12">
+	<PieChart />
+	<div id="completed-courses" class="col-span-6 col-start-8 gap-6 md:grid md:grid-cols-2">
+		<DonutChart title="mandatory" />
+		<DonutChart title="elective" />
+		<DonutChart title="foundation" />
+	</div>
+</section>

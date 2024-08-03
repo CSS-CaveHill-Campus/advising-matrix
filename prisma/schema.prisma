@@ -118,16 +118,20 @@ model ProgramRequirement {
   type      RequirementType
   credits   Int
   details   Json
+
+  StudentCourse StudentCourse[]
 }
 
 model StudentCourse {
-  id        String @id
-  studentId String
-  courseId  String
-  grade     String
+  id            String  @id
+  studentId     String
+  courseId      String
+  grade         String
+  requirementId String?
 
-  student Student @relation(fields: [studentId], references: [id])
-  course  Course  @relation(fields: [courseId], references: [id])
+  student     Student             @relation(fields: [studentId], references: [id])
+  course      Course              @relation(fields: [courseId], references: [id])
+  requirement ProgramRequirement? @relation(fields: [requirementId], references: [id])
 }
 
 enum UserRole {

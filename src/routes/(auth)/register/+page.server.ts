@@ -69,8 +69,6 @@ export const actions: Actions = {
 					.where('id', '=', student.id)
 					.execute();
 			});
-
-			return redirect(302, '/login?message=registration_complete');
 		} catch (err) {
 			// if (err instanceof errors.E_VALIDATION_ERROR) {
 			// 	return fail(400, {
@@ -82,5 +80,6 @@ export const actions: Actions = {
 			console.error('Error during registration:', err);
 			return fail(500, { error: 'An error occurred during registration. Please try again.' });
 		}
+		return redirect(302, '/login?message=registration_complete');
 	}
 };

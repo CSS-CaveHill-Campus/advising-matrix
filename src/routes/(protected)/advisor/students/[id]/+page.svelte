@@ -1,49 +1,100 @@
 <script lang="ts">
 	import type { PageData } from './$types';
-
+	import { Button } from '$lib/components/ui/button';
+	import { Card, CardContent, CardHeader } from '$lib/components/ui/card';
+	import { Label } from '$lib/components/ui/label';
+	import { Input } from '$lib/components/ui/input';
+	import * as Select from '$lib/components/ui/select';
+	import Avatar from '$lib/components/ui/Avatar.svelte';
 	export let data: PageData;
+
+	let selectedMajorId: number | undefined;
+
+	$: studentMajor = data.majors.filter((major) => major.id === data.student.program_id)[0];
 </script>
 
-<div class="container mt-8 max-w-md">
-	<h2 class="py-4 font-bold">View Student Invitation</h2>
-	<form class="mx-auto max-w-md" method="post" action="?/delete">
-		<div class="group relative z-0 mb-5 w-full">
-			<input
-				type="email"
-				name="floating_email"
-				id="floating_email"
-				class="peer block w-full appearance-none border-0 border-b-2 border-gray-300 bg-transparent px-0 py-2.5 text-sm text-gray-900 focus:border-blue-600 focus:outline-none focus:ring-0 dark:border-gray-600 dark:text-gray-500 dark:focus:border-blue-500 dark:focus:text-blue-500"
-				placeholder=" "
-				required
-				value={data.student.email}
-				readonly
-			/>
-			<label
-				for="floating_email"
-				class="absolute top-3 -z-10 origin-[0] -translate-y-6 scale-75 transform text-sm text-gray-500 duration-300 peer-placeholder-shown:translate-y-0 peer-placeholder-shown:scale-100 peer-focus:start-0 peer-focus:-translate-y-6 peer-focus:scale-75 peer-focus:font-medium peer-focus:text-blue-600 dark:text-gray-400 peer-focus:dark:text-blue-500 rtl:peer-focus:left-auto rtl:peer-focus:translate-x-1/4"
-				>Email address</label
-			>
+<div class="py-8">
+	<div class="space-y-6 px-4 sm:px-6">
+		<header class="space-y-2">
+			<div class="flex items-center space-x-3">
+				<Avatar name={data.student.name} size="lg" />
+				<div class="space-y-1">
+					<h1 class="text-2xl font-bold">{data.student.name}</h1>
+					<!-- <Button size="sm">Change photo</Button> -->
+				</div>
+			</div>
+		</header>
+		<div class="space-y-8">
+			<Card>
+				<CardContent class="space-y-6 pt-6">
+					<div class="space-y-2">
+						<Label for="name">Name</Label>
+						<Input id="name" placeholder="E.g. Jane Doe" value={data.student.name} />
+					</div>
+					<div class="grid gap-3 md:grid-cols-3">
+						<div class="space-y-2 md:col-span-2">
+							<Label for="email">Email</Label>
+							<Input
+								id="email"
+								placeholder="E.g. jane@mycavehill.uwi.edu"
+								value={data.student.email}
+							/>
+						</div>
+						<div class="space-y-2">
+							<Label for="level">Level</Label>
+							<Select.Root>
+								<Select.Trigger class="w-full">
+									<Select.Value placeholder="Level" />
+								</Select.Trigger>
+								<Select.Content>
+									<Select.Item value="Level 1">Level 1</Select.Item>
+									<Select.Item value="Level 2">Level 2</Select.Item>
+									<Select.Item value="Level 3">Level 3</Select.Item>
+								</Select.Content>
+							</Select.Root>
+						</div>
+					</div>
+				</CardContent>
+			</Card>
+			<Card>
+				<CardHeader>
+					<div>Undergraduate Major</div>
+				</CardHeader>
+				<CardContent>
+					<div class="space-y-2">
+						<Label for="level">Undergraduate Major</Label>
+						<Select.Root>
+							<Select.Trigger class="w-full">
+								<Select.Value placeholder={studentMajor?.name} />
+							</Select.Trigger>
+							<Select.Content>
+								{#each data.majors as major}
+									<Select.Item value={major.id}>{major.name}</Select.Item>
+								{/each}
+							</Select.Content>
+						</Select.Root>
+					</div>
+				</CardContent>
+			</Card>
+			<Card>
+				<CardHeader>
+					<div>Alternative Email</div>
+					<div>For your security, please use your offical university email.</div>
+				</CardHeader>
+				<CardContent class="space-y-4">
+					<div class="space-y-2">
+						<Label for="alternative-email">Alternative Email</Label>
+						<Input type="email" id="alternative-email" />
+					</div>
+					<div class="space-y-2">
+						<Label for="alternative-email1">Confirm Alternative Email</Label>
+						<Input type="email" id="alternative-email1" />
+					</div>
+				</CardContent>
+			</Card>
 		</div>
-		<div class="group relative z-0 mb-5 w-full">
-			<input
-				type="text"
-				name="floating_name"
-				id="floating_name"
-				class="peer block w-full appearance-none border-0 border-b-2 border-gray-300 bg-transparent px-0 py-2.5 text-sm text-gray-900 focus:border-blue-600 focus:outline-none focus:ring-0 dark:border-gray-600 dark:text-gray-500 dark:focus:border-blue-500 dark:focus:text-blue-500"
-				placeholder=" "
-				required
-				value={data.student.name}
-			/>
-			<label
-				for="floating_name"
-				class="absolute top-3 -z-10 origin-[0] -translate-y-6 scale-75 transform text-sm text-gray-500 duration-300 peer-placeholder-shown:translate-y-0 peer-placeholder-shown:scale-100 peer-focus:start-0 peer-focus:-translate-y-6 peer-focus:scale-75 peer-focus:font-medium peer-focus:text-blue-600 dark:text-gray-400 peer-focus:dark:text-blue-500 rtl:peer-focus:translate-x-1/4"
-				>Student Name</label
-			>
+		<div class="pt-6">
+			<Button>Save</Button>
 		</div>
-		<button
-			type="submit"
-			class="w-full rounded-lg bg-blue-700 px-5 py-2.5 text-center text-sm font-medium text-white hover:bg-blue-800 focus:outline-none focus:ring-4 focus:ring-blue-300 dark:bg-blue-600 dark:hover:bg-blue-700 dark:focus:ring-blue-800 sm:w-auto"
-			>delete</button
-		>
-	</form>
+	</div>
 </div>

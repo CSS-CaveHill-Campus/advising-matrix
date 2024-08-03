@@ -1,4 +1,4 @@
-import { fail, type Load } from '@sveltejs/kit';
+import { fail } from '@sveltejs/kit';
 import type { Actions } from './$types';
 import { db } from '$lib/db';
 import { generateTokenWithExpiration } from '$lib/server/auth';
@@ -11,8 +11,11 @@ import type { PageServerLoad } from '../$types';
 const defaults = { email: '', name: '', programId: '' };
 
 const schema = Vine.object({
-	email: Vine.string().trim().email(),
-	name: Vine.string().trim().minLength(2).maxLength(50),
+	email: Vine.string()
+		.trim()
+		.email()
+		.regex(/@mycavehill\.uwi\.edu$/),
+	name: Vine.string().trim().minLength(3).maxLength(50),
 	programId: Vine.string().trim()
 });
 
@@ -31,6 +34,12 @@ export const actions: Actions = {
 		}
 
 		const form = await superValidate(request, vine(schema, { defaults }));
+
+		if (form.errors.email) {
+			form.errors.email = [
+				'Please enter a valid email address with the domain @mycavehill.uwi.edu'
+			];
+		}
 
 		if (!form.valid) {
 			return fail(400, { form });
