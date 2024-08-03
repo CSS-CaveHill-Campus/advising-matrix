@@ -10,7 +10,6 @@ export const load = (async ({ locals }) => {
 		.selectFrom('Student')
 		.select(['Student.id', 'Student.user_id'])
 		.where('Student.user_id', '=', userId)
-		.where('Student.user_id', '=', userId)
 		.executeTakeFirst();
 	if (!data) {
 		return {
