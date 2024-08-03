@@ -1,12 +1,26 @@
 <script lang="ts">
 	import type { ApexOptions } from 'apexcharts';
-	import { Chart, A, Popover, Tooltip } from 'flowbite-svelte';
+	import {
+		Chart,
+		Card,
+		A,
+		Button,
+		Dropdown,
+		DropdownItem,
+		Popover,
+		Tooltip
+	} from 'flowbite-svelte';
 	import {
 		InfoCircleSolid,
 		ArrowDownToBracketOutline,
-		ChevronRightOutline
+		ChevronDownOutline,
+		ChevronRightOutline,
+		PenSolid,
+		DownloadSolid,
+		ShareNodesSolid
 	} from 'flowbite-svelte-icons';
 
+	// export let id = 'DonutChart';
 	export let title = 'Credits';
 	export let description = 'Credits of this category completed...';
 	export let series = [50, 50];
@@ -16,7 +30,7 @@
 		series: series,
 		colors: ['#272861', '#D6D6D6'],
 		chart: {
-			height: 450,
+			height: 320,
 			width: '100%',
 			type: 'donut'
 		},
@@ -37,7 +51,7 @@
 						total: {
 							showAlways: true,
 							show: true,
-							label: 'Credits',
+							label: 'Unique visitors',
 							fontFamily: 'Inter, sans-serif',
 							formatter: function (w: any) {
 								const sum = w.globals.seriesTotals.reduce((a: number, b: number) => {

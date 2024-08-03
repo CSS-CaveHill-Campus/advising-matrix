@@ -6,12 +6,9 @@
 	$: if (user.name === null) user.name = 'Anonymous';
 </script>
 
-<slot name="sidebar">
-	<Sidebar {user} />
-</slot>
-
-<slot name="main">
-	<main class="ms-16 h-dvh overflow-y-auto bg-gray-50 p-6 md:ms-64">
+<Sidebar {user} />
+<main class="h-screen bg-gray-50 ps-16 md:ps-64">
+	<div class="p-2 sm:p-5 sm:py-0 md:pt-5">
 		<slot />
-	</main>
-</slot>
+	</div>
+</main>

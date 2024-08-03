@@ -9,20 +9,21 @@ export const load = (async ({ locals, params }) => {
 		throw error(401, 'Unauthorized');
 	}
 
-	const studentData = await db
+	const data = await db
 		.selectFrom('User')
-		.innerJoin('Student', 'Student.user_id', 'User.id')
-		.select(['User.email', 'User.name', 'Student.program_id', 'User.role'])
+		.select(['User.email', 'User.id', 'User.name', 'created_at', 'updated_at', 'User.role'])
 		.where('User.id', '=', params.id)
 		.executeTakeFirst();
 
-	if (!studentData) {
-		throw error(404, 'Student Not found');
+	if (!data) {
+		throw error(404, 'Not found');
 	}
 
-	const studentPrograms = await db.selectFrom('Program').selectAll().execute();
+	if (data.role !== 'STUDENT') {
+		throw error(403, 'Forbidden');
+	}
 
-	return { student: { ...studentData }, majors: studentPrograms };
+	return { student: data };
 }) satisfies PageServerLoad;
 
 export const actions: Actions = {

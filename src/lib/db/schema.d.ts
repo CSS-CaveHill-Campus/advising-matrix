@@ -79,7 +79,6 @@ export type StudentCourse = {
 	studentId: string;
 	courseId: string;
 	grade: string;
-	requirementId: string | null;
 };
 export type User = {
 	id: string;
